@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>FastFood App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #e63946;
+  --dark: #0f0f0f;
+  --card: #1a1a1a;
+  --teal: #2a9d8f;
+  --orange: #f4a261;
+  --gray: #2a2a2a;
+}
+
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--dark); color: white; }
+
+/* ── HEADER ── */
+header {
+  background: #111;
+  border-bottom: 2px solid var(--red);
+  padding: 0 40px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; letter-spacing: 1px; }
+.logo span { color: var(--red); }
+nav { display: flex; gap: 28px; font-size: 14px; }
+nav a { color: #aaa; text-decoration: none; transition: color 0.2s; cursor: pointer; }
+nav a:hover { color: white; }
+.header-right { display: flex; align-items: center; gap: 20px; }
+.cart-btn {
+  background: var(--red); border: none; color: white;
+  padding: 8px 18px; border-radius: 20px; font-size: 14px;
+  cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #1a0000 0%, #0f0f0f 60%);
+  padding: 60px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid #222;
+}
+.hero-text h1 { font-size: 46px; font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+.hero-text h1 span { color: var(--red); }
+.hero-text p { color: #aaa; font-size: 16px; margin-bottom: 28px; max-width: 420px; line-height: 1.6; }
+.hero-btns { display: flex; gap: 14px; }
+.btn-primary {
+  background: var(--red); color: white; border: none;
+  padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-primary:hover { background: #c1121f; }
+.btn-secondary {
+  background: transparent; color: white; border: 2px solid #444;
+  padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: white; }
+.hero-img { font-size: 120px; filter: drop-shadow(0 0 40px rgba(230,57,70,0.3)); }
+
+/* ── STATS ── */
+.stats {
+  display: flex; justify-content: center; gap: 60px;
+  padding: 28px 40px; background: #111; border-bottom: 1px solid #222;
+}
+.stat { text-align: center; }
+.stat .num { font-size: 26px; font-weight: 800; color: var(--red); }
+.stat .label { font-size: 12px; color: #888; margin-top: 4px; }
+
+/* ── VISITANTES ── */
+.visitantes-bar {
+  background: #111; border-bottom: 1px solid #1a1a1a;
+  padding: 10px 40px; display: flex; align-items: center;
+  justify-content: flex-end; gap: 8px; font-size: 13px; color: #666;
+}
+.visitantes-bar .pulso {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #2a9d8f; animation: pulsar 1.5s infinite;
+}
+@keyframes pulsar {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+.visitantes-bar strong { color: var(--teal); }
+
+/* ── CATEGORIAS ── */
+.section-title {
+  padding: 36px 40px 16px; font-size: 20px; font-weight: 700;
+  color: #fff; display: flex; align-items: center; gap: 10px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: #222; margin-left: 16px; }
+.categorias { display: flex; gap: 10px; padding: 0 40px 20px; overflow-x: auto; }
+.categorias button {
+  background: var(--gray); border: 1px solid #333; color: #ccc;
+  padding: 8px 20px; border-radius: 20px; cursor: pointer;
+  font-size: 13px; white-space: nowrap; transition: all 0.2s;
+}
+.categorias button:hover, .categorias button.active {
+  background: var(--red); border-color: var(--red); color: white;
+}
+
+/* ── PRODUTOS ── */
+.main-layout { display: flex; gap: 0; padding: 0 40px 40px; }
+.container {
+  flex: 1; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px; padding-right: 30px;
+}
+.card {
+  background: var(--card); border-radius: 14px; overflow: hidden;
+  border: 1px solid #222; transition: transform 0.2s, border-color 0.2s;
+}
+.card:hover { transform: translateY(-4px); border-color: #444; }
+.card img { width: 100%; height: 140px; object-fit: cover; }
+.card .badge {
+  background: var(--red); color: white; font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px; display: inline-block;
+  margin: 10px 10px 0; text-transform: uppercase;
+}
+.content { padding: 10px 12px 14px; }
+.content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.content p { font-size: 12px; color: #888; margin-bottom: 10px; }
+.preco { color: var(--orange); font-size: 18px; font-weight: 800; margin-bottom: 10px; }
+.btn {
+  width: 100%; padding: 8px; background: var(--teal);
+  border: none; color: white; border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.2s;
+}
+.btn:hover { background: #21867a; }
+
+/* ── CARRINHO ── */
+.carrinho {
+  width: 290px; background: #111; border-radius: 14px;
+  padding: 20px; border: 1px solid #222;
+  height: fit-content; position: sticky; top: 85px;
+}
+.carrinho h3 {
+  font-size: 16px; font-weight: 700; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 1px solid #222;
+  display: flex; align-items: center; gap: 8px;
+}
+.item {
+  font-size: 13px; color: #ccc; padding: 8px 0;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+}
+.item-nome { flex: 1; font-size: 12px; }
+.item-controles { display: flex; align-items: center; gap: 5px; }
+.item-controles button {
+  background: #2a2a2a; border: 1px solid #444; color: white;
+  width: 24px; height: 24px; border-radius: 6px;
+  cursor: pointer; font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  padding: 0;
+}
+.item-controles button:hover { background: var(--red); border-color: var(--red); }
+.item-controles .qtd { font-size: 13px; font-weight: 700; min-width: 18px; text-align: center; }
+.item-preco { font-size: 12px; color: var(--orange); min-width: 48px; text-align: right; }
+
+#total { font-size: 18px; font-weight: 800; color: var(--orange); margin: 16px 0 14px; }
+.finalizar {
+  width: 100%; padding: 12px; background: var(--red);
+  border: none; color: white; border-radius: 10px;
+  font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s;
+}
+.finalizar:hover { background: #c1121f; }
+.carrinho-vazio { text-align: center; color: #555; font-size: 13px; padding: 20px 0; }
+
+/* ── SOBRE ── */
+.sobre-section {
+  padding: 60px 40px;
+  background: #111;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+}
+.sobre-section .section-title { padding: 0 0 24px; }
+.sobre-section .section-title::after { background: #333; }
+.sobre-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: center;
+}
+.sobre-texto p {
+  color: #aaa;
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.sobre-texto p:last-child { margin-bottom: 0; }
+.sobre-emoji {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.sobre-emoji .big { font-size: 90px; filter: drop-shadow(0 0 30px rgba(230,57,70,0.3)); }
+.sobre-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.sobre-tags span {
+  background: #1e1e1e; border: 1px solid #333;
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; color: #aaa;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: #111; border-top: 1px solid #222;
+  padding: 40px; display: flex;
+  justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 20px;
+}
+.footer-logo { font-size: 20px; font-weight: 800; }
+.footer-logo span { color: var(--red); }
+.footer-links { display: flex; gap: 24px; font-size: 13px; color: #888; }
+.footer-copy { font-size: 12px; color: #555; width: 100%; text-align: center; margin-top: 10px; }
+
+/* ── CHAT ── */
+#chatBtn {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--red); width: 60px; height: 60px;
+  border-radius: 50%; display: flex; justify-content: center; align-items: center;
+  font-size: 26px; cursor: pointer; z-index: 999;
+  box-shadow: 0 4px 20px rgba(230,57,70,0.5); transition: transform 0.2s;
+}
+#chatBtn:hover { transform: scale(1.1); }
+#chatBox {
+  position: fixed; bottom: 100px; right: 28px;
+  width: 320px; height: 440px; background: #1c1c1c;
+  border-radius: 18px; display: none; flex-direction: column;
+  overflow: hidden; z-index: 999;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid #333;
+}
+#chatHeader {
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+}
+#chatHeader .avatar { font-size: 24px; }
+#chatHeader .info { display: flex; flex-direction: column; }
+#chatHeader .nome { font-weight: 700; font-size: 14px; }
+#chatHeader .status { font-size: 11px; opacity: 0.85; }
+#chatMensagens {
+  flex: 1; padding: 14px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.msg {
+  max-width: 85%; padding: 9px 13px; border-radius: 14px;
+  font-size: 13px; line-height: 1.5; white-space: pre-wrap;
+}
+.user { align-self: flex-end; background: var(--red); color: white; border-bottom-right-radius: 4px; }
+.bot { align-self: flex-start; background: #2a2a2a; color: #f0f0f0; border-bottom-left-radius: 4px; }
+#chatInputArea { display: flex; border-top: 1px solid #333; }
+#chatInputArea input {
+  flex: 1; padding: 12px 14px; border: none;
+  background: #111; color: white; outline: none; font-size: 13px;
+}
+#chatInputArea button {
+  background: var(--red); border: none; color: white;
+  padding: 12px 16px; cursor: pointer; font-size: 18px; transition: background 0.2s;
+}
+#chatInputArea button:hover { background: #c1121f; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">🍔 <span>Fast</span>Food</div>
+  <nav>
+    <a onclick="document.querySelector('.categorias').scrollIntoView({behavior:'smooth'})">Cardápio</a>
+    <a onclick="filtrar('combo', null)">Combos</a>
+    <a>Delivery</a>
+    <a onclick="document.querySelector('.sobre-section').scrollIntoView({behavior:'smooth'})">Sobre</a>
+  </nav>
+  <div class="header-right">
+    <div style="font-size:13px;color:#888;">🛒 <span id="contador">0</span> itens</div>
+    <button class="cart-btn" onclick="abrirCheckout()">Finalizar Pedido</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>O melhor<br><span>fast food</span><br>da cidade 🔥</h1>
+    <p>Lanches artesanais, ingredientes frescos e entrega rápida na sua porta. Peça agora e receba em até 30 min.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.querySelector('.categorias').scrollIntoView({behavior:'smooth'})">Ver Cardápio</button>
+      <button class="btn-secondary" onclick="document.querySelector('.sobre-section').scrollIntoView({behavior:'smooth'})">Sobre nós</button>
+    </div>
+  </div>
+  <div class="hero-img">🍔</div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="num">4.9⭐</div><div class="label">Avaliação média</div></div>
+  <div class="stat"><div class="num">+10k</div><div class="label">Clientes satisfeitos</div></div>
+  <div class="stat"><div class="num">30min</div><div class="label">Entrega média</div></div>
+  <div class="stat"><div class="num">7 dias</div><div class="label">Funcionamento</div></div>
+</div>
+
+<!-- VISITANTES -->
+<div class="visitantes-bar">
+  <div class="pulso"></div>
+  <span>👥 <strong id="totalVisitas">...</strong> pessoas já visitaram este site</span>
+</div>
+
+<!-- CARDÁPIO -->
+<div class="section-title">🍟 Nosso Cardápio</div>
+<div class="categorias">
+  <button class="active" onclick="filtrar('todos', this)">Todos</button>
+  <button onclick="filtrar('lanche', this)">🍔 Lanches</button>
+  <button onclick="filtrar('bebida', this)">🥤 Bebidas</button>
+  <button onclick="filtrar('sobremesa', this)">🍦 Sobremesas</button>
+  <button onclick="filtrar('combo', this)">🎁 Combos</button>
+</div>
+
+<div class="main-layout">
+  <div class="container" id="lista"></div>
+
+  <!-- CARRINHO -->
+  <div class="carrinho">
+    <h3>🛒 Seu Pedido</h3>
+    <div id="itens"><div class="carrinho-vazio">Nenhum item ainda</div></div>
+    <div id="total" style="display:none"></div>
+    <button class="finalizar" onclick="abrirCheckout()">Finalizar Pedido →</button>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section class="sobre-section">
+  <div class="section-title">ℹ️ Sobre</div>
+  <div class="sobre-grid">
+    <div class="sobre-texto">
+      <p>Nosso site de fast food foi criado com a ideia de trazer praticidade e rapidez para os clientes que gostam de fazer pedidos online de maneira simples e moderna. O projeto surgiu durante o desenvolvimento de uma plataforma inspirada em grandes redes de delivery, buscando unir um visual atrativo com uma navegação fácil e intuitiva.</p>
+      <p>A proposta do site é apresentar diversos produtos, como hambúrgueres, batatas fritas, bebidas, sobremesas e combos especiais, permitindo que os clientes conheçam o cardápio e façam seus pedidos com mais facilidade.</p>
+      <p>Além disso, o desenvolvimento do site foi pensado para oferecer uma experiência moderna, funcionando tanto em computadores quanto em celulares, sempre priorizando conforto, velocidade e praticidade para os usuários.</p>
+    </div>
+    <div class="sobre-emoji">
+      <div class="big">🍔</div>
+      <div class="sobre-tags">
+        <span>🚀 Entrega rápida</span>
+        <span>📱 Responsivo</span>
+        <span>🤖 IA integrada</span>
+        <span>🍟 Cardápio variado</span>
+        <span>💳 Múltiplas formas de pagamento</span>
+        <span>⭐ 4.9 de avaliação</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🍔 <span>Fast</span>Food</div>
+  <div class="footer-links">
+    <span>Cardápio</span>
+    <span>Delivery</span>
+    <span>Franquias</span>
+    <span>Contato</span>
+  </div>
+  <div class="footer-copy">© 2025 FastFood App — Todos os direitos reservados</div>
+</footer>
+
+<!-- CHAT -->
+<div id="chatBtn" onclick="abrirChat()">💬</div>
+<div id="chatBox">
+  <div id="chatHeader">
+    <div class="avatar">🍔</div>
+    <div class="info">
+      <span class="nome">Burgão — Atendente IA</span>
+      <span class="status">🟢 Online agora</span>
+    </div>
+  </div>
+  <div id="chatMensagens"></div>
+  <div id="chatInputArea">
+    <input id="chatInput" placeholder="Manda ver..." onkeydown="if(event.key==='Enter') enviarMensagem()">
+    <button onclick="enviarMensagem()">➤</button>
+  </div>
+</div>
+
+<script>
+/* ── VISITANTES ── */
+async function registrarVisita() {
+  try {
+    const res = await fetch('https://api.countapi.xyz/hit/fastfood-app-nicolas/visitas');
+    const data = await res.json();
+    if (data && data.value) animarContador(data.value);
+  } catch(e) {
+    let local = parseInt(localStorage.getItem('visitas_total') || '0') + 1;
+    localStorage.setItem('visitas_total', local);
+    animarContador(local);
+  }
+}
+function animarContador(valor) {
+  const el = document.getElementById('totalVisitas');
+  let atual = 0;
+  const passo = Math.ceil(valor / 40);
+  const timer = setInterval(() => {
+    atual = Math.min(atual + passo, valor);
+    el.textContent = atual.toLocaleString('pt-BR');
+    if (atual >= valor) clearInterval(timer);
+  }, 30);
+}
+registrarVisita();
+
+/* ── PRODUTOS ── */
+const produtos = [
+  {nome:"Hambúrguer",  preco:18, categoria:"lanche",    desc:"Clássico artesanal",      img:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd"},
+  {nome:"Cheeseburger",preco:22, categoria:"lanche",    desc:"Com queijo cheddar",       img:"https://images.unsplash.com/photo-1550547660-d9450f859349"},
+  {nome:"Batata Frita",preco:10, categoria:"lanche",    desc:"Crocante e sequinha",      img:"https://images.unsplash.com/photo-1576107232684-1279f390859f"},
+  {nome:"Refrigerante",preco:6,  categoria:"bebida",    desc:"Gelado na lata",           img:"https://images.unsplash.com/photo-1581006852262-e4307cf6283a"},
+  {nome:"Sorvete",     preco:7,  categoria:"sobremesa", desc:"Casquinha cremosa",        img:"https://images.unsplash.com/photo-1563805042-7684c019e1cb"},
+  {nome:"Combo Burger",preco:30, categoria:"combo",     desc:"Lanche + Batata + Refri",  img:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092"}
+];
+
+let carrinho = [];
+
+function carregar(lista = produtos) {
+  listaEl.innerHTML = "";
+  lista.forEach((p, i) => {
+    listaEl.innerHTML += `
+    <div class="card">
+      <img src="${p.img}" loading="lazy">
+      <span class="badge">${p.categoria}</span>
+      <div class="content">
+        <h4>${p.nome}</h4>
+        <p>${p.desc}</p>
+        <div class="preco">R$ ${p.preco},00</div>
+        <button class="btn" onclick="add(${i})">+ Adicionar</button>
+      </div>
+    </div>`;
+  });
+}
+
+function add(i) {
+  const p = produtos[i];
+  const item = carrinho.find(x => x.nome === p.nome);
+  if (item) item.qtd++;
+  else carrinho.push({...p, qtd: 1});
+  atualizar();
+}
+
+function remover(nome) {
+  const item = carrinho.find(x => x.nome === nome);
+  if (!item) return;
+  if (item.qtd > 1) item.qtd--;
+  else carrinho = carrinho.filter(x => x.nome !== nome);
+  atualizar();
+}
+
+function atualizar() {
+  const itensEl = document.getElementById("itens");
+  const totalEl = document.getElementById("total");
+  itensEl.innerHTML = "";
+  let total = 0, qtd = 0;
+
+  if (carrinho.length === 0) {
+    itensEl.innerHTML = '<div class="carrinho-vazio">Nenhum item ainda</div>';
+    totalEl.style.display = "none";
+  } else {
+    carrinho.forEach(p => {
+      total += p.preco * p.qtd;
+      qtd += p.qtd;
+      itensEl.innerHTML += `
+        <div class="item">
+          <span class="item-nome">${p.nome}</span>
+          <div class="item-controles">
+            <button onclick="remover('${p.nome}')">−</button>
+            <span class="qtd">${p.qtd}</span>
+            <button onclick="addNome('${p.nome}')">+</button>
+          </div>
+          <span class="item-preco">R$ ${p.preco * p.qtd}</span>
+        </div>`;
+    });
+    totalEl.style.display = "block";
+    totalEl.innerHTML = `<div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:10px;border-top:1px solid #333;">
+      <span style="font-size:14px;color:#aaa;">Total</span>
+      <span>R$ ${total},00</span>
+    </div>`;
+  }
+  contador.innerText = qtd;
+}
+
+function addNome(nome) {
+  const item = carrinho.find(x => x.nome === nome);
+  if (item) { item.qtd++; atualizar(); }
+}
+
+function filtrar(cat, btn) {
+  document.querySelectorAll('.categorias button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (cat === "todos") carregar(produtos);
+  else carregar(produtos.filter(p => p.categoria === cat));
+}
+
+function abrirCheckout() {
+  if (carrinho.length === 0) { alert("Adicione itens ao carrinho primeiro!"); return; }
+  alert("Pedido finalizado! Total: R$ " + carrinho.reduce((a, p) => a + p.preco * p.qtd, 0) + ",00 ✅");
+}
+
+/* ── CHATBOT (sem alteração) ── */
+let historico = [];
+const GROQ_API_KEY = "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";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const SYSTEM_PROMPT = `Você é o "Burgão", atendente virtual de um fast food chamado FastFood App. Você tem personalidade própria: é descontraído, divertido, usa gírias leves do dia a dia e nunca dá duas respostas iguais. Varie sempre o jeito de falar — às vezes mais animado, às vezes mais casual, às vezes com uma pitada de humor. Nunca use listas em todas as respostas, misture com texto corrido.
+
+CARDÁPIO ATUAL:
+- Hambúrguer — R$ 18
+- Cheeseburger — R$ 22
+- Batata Frita — R$ 10
+- Refrigerante — R$ 6
+- Sorvete — R$ 7
+- Combo Burger (lanche + batata + refri) — R$ 30
+
+FORMAS DE PAGAMENTO: cartão, Pix, dinheiro
+HORÁRIO: seg-sex 10h–23h | sáb-dom 10h–00h
+ENTREGA: delivery e retirada no local
+
+REGRAS DE COMPORTAMENTO:
+1. Varie SEMPRE o tom e estrutura das respostas. Nunca comece duas respostas com a mesma frase.
+2. Você pode responder perguntas fora do contexto do restaurante de forma leve e breve — como curiosidades, clima, esporte, música — mas sempre trazendo de volta pro papo do food com naturalidade.
+3. Se o cliente pedir algo que NÃO está no cardápio (ex: pizza, sushi, açaí, frango assado), seja honesto que não tem, MAS indique um site ou app onde ele pode encontrar. Use esses exemplos conforme o produto:
+   - Pizza → "dá uma olhada no iFood (ifood.com.br) ou no site da Domino's (dominos.com.br)"
+   - Sushi → "o iFood tem bastante opção (ifood.com.br)"
+   - Açaí → "Açaí mania tem delivery (acaimania.com.br) ou iFood"
+   - Comida japonesa → "Japan by Japan ou iFood tão cheios de opção"
+   - Comida saudável → "o GreenFood (greenfood.com.br) ou iFood fitness"
+   - Qualquer outro → sugira iFood (ifood.com.br) ou Rappi (rappi.com.br) como alternativas gerais
+4. Nunca seja robótico. Evite frases feitas como "Claro!", "Certamente!", "Com prazer!".
+5. Se o cliente estiver brincando ou mandando mensagem aleatória, entre na brincadeira por um momento antes de voltar ao assunto.
+6. Máximo de 3 linhas por resposta — seja direto e humano.`;
+
+function abrirChat() {
+  const box = document.getElementById("chatBox");
+  const aberto = box.style.display === "flex";
+  box.style.display = aberto ? "none" : "flex";
+  if (!aberto && document.getElementById("chatMensagens").innerHTML === "") {
+    adicionarMsg("Eai! 👋 Pode chamar de Burgão. Tô aqui pra te ajudar com o pedido — ou só pra bater um papo mesmo, sem pressão 😄", "bot");
+  }
+}
+function enviarMensagem() {
+  const input = document.getElementById("chatInput");
+  const msg = input.value.trim();
+  if (!msg) return;
+  adicionarMsg(msg, "user");
+  input.value = "";
+  adicionarMsg("digitando...", "bot", "typing");
+  responder(msg);
+}
+function adicionarMsg(texto, tipo, id = null) {
+  const chat = document.getElementById("chatMensagens");
+  const div = document.createElement("div");
+  div.classList.add("msg", tipo);
+  div.textContent = texto;
+  if (id) div.id = id;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+async function responder(msg) {
+  try {
+    historico.push({ role: "user", content: msg });
+    if (historico.length > 20) historico = historico.slice(-20);
+    const res = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + GROQ_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...historico],
+        max_tokens: 300, temperature: 1.1
+      })
+    });
+    const data = await res.json();
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+    if (data.choices && data.choices[0]) {
+      const resposta = data.choices[0].message.content;
+      adicionarMsg(resposta, "bot");
+      historico.push({ role: "assistant", content: resposta });
+    } else {
+      adicionarMsg("Deu ruim aqui, tenta de novo! 😅", "bot");
+    }
+  } catch(e) {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
+    adicionarMsg("Perdi a conexão por um segundo, manda de novo! 🙈", "bot");
+  }
+}
+
+const listaEl = document.getElementById("lista");
+carregar();
+</script>
+</body>
+</html>
